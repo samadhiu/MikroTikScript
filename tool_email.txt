@@ -1,0 +1,4 @@
+/tool e-mail
+set address=ip.add.re.ss
+set port=port
+set from=emai_address
