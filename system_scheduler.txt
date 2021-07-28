@@ -1,0 +1,2 @@
+/system scheduler add name="scheduler-startup" on-event=":delay 30
+/system script run script-startup" start-date=Jan/01/2020 start-time=startup

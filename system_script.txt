@@ -1,0 +1,39 @@
+/system script add name="script-startup" source={
+:delay 1
+ 
+:local reportBody ""
+ 
+:local deviceName [/system identity get name]
+:local deviceDate [/system clock get date]
+:local deviceTime [/system clock get time]
+:local hwModel [/system routerboard get model]
+:local rosVersion [/system package get system version]
+:local currentFirmware [/system routerboard get current-firmware]
+:local upgradeFirmware [/system routerboard get upgrade-firmware]
+
+:set reportBody ($reportBody . "[$deviceName] Reboot@ $deviceDate at $deviceTime\n\n")
+
+:set reportBody ($reportBody . "HW: $hwModel\n")
+:set reportBody ($reportBody . "RouterOS: $rosVersion\n")
+:set reportBody ($reportBody . "Current Firmware: $currentFirmware\n")
+:set reportBody ($reportBody . "Upgrade Firmware: $upgradeFirmware")
+if ( $currentFirmware < $upgradeFirmware) do={
+:set reportBody ($reportBody . " NOTE: You should upgrade the RouterBOARD firmware!\n")
+}
+
+:set reportBody ($reportBody . "\n\n=== Critical Log Events ===\n" )
+
+:local x
+:local ts
+:local msg
+foreach i in=([/log find where topics~"critical"]) do={
+:set $ts [/log get $i time]
+:set $msg [/log get $i message]
+:set $reportBody ($reportBody  . $ts . " " . $msg . "\n" )
+}
+
+:set reportBody ($reportBody . "=== end of report ===\n")
+
+/tool e-mail send subject="[$deviceName] Reboot" to="email@address.com" body=$reportBody
+}
+
